@@ -1,0 +1,146 @@
+
+-->to process genome = serial- 8.052 seconds, parallel- 1.1331 seconds
+-->memory usage= (8.3+7.2) MB
+
+1- none- 0.403
+2- none- 0.414
+3- none- 0.388
+4- none- 0.383
+5- none- 0.393
+6- none- 0.408
+7- 16452 positions matched- 107.57
+8- none- 0.411
+9- none- 0.403
+10- none- 0.384
+11- none- 0.41
+12- none- 0.38
+13- 743 positions matched- 4.801
+14- none- 0.386
+15- none- 0.433
+16- none- 0.38
+17- none- 0.434
+18- none- 0.406
+19- none- 0.382
+20- none- 0.384
+21- none- 0.427
+22- 0 positions matched- 1.681
+23- none- 0.44
+24- 254 positions matched- 1.665
+25- none- 0.41
+26- none- 0.38
+27- none- 0.377
+28- none- 0.411
+29- none- 0.382
+30- none- 0.381
+31- none- 0.411
+32- none- 0.374
+33- none- 0.38
+34- none- 0.41
+35- 4568 positions matched- 34.254
+36- none- 0.387
+37- none- 0.385
+38- none- 0.381
+39- none- 0.432
+40- none- 0.38
+41- 0 positions matched- 2.915
+42- 6183 positions matched- 45.606
+43- none- 0.381
+44- none- 0.398
+45- none- 0.415
+46- none- 0.405
+47- none- 0.38
+48- none- 0.38
+49- 3098 positions matched- 31.558
+50- none- 0.43
+51- 
+
+--> to process read = 0.0036 seconds
+
+--> to form tuples = 0.00015 seconds
+
+--> for finding jaccard similarity in all those tuples = 0.01564 seconds
+
+
+sys3@sys3-HP-Elite-Tower-600-G9-Desktop-PC:~/Desktop/btp-code$ /usr/bin/time -v ./test_one.exe
+1394.843165
+	Command being timed: "./test_one.exe"
+	User time (seconds): 26600.38
+	System time (seconds): 27.07
+	Percent of CPU this job got: 1891%
+	Elapsed (wall clock) time (h:mm:ss or m:ss): 23:27.67 = 1407.67 seconds
+	Average shared text size (kbytes): 0
+	Average unshared data size (kbytes): 0
+	Average stack size (kbytes): 0
+	Average total size (kbytes): 0
+	Maximum resident set size (kbytes): 2588072
+	Average resident set size (kbytes): 0
+	Major (requiring I/O) page faults: 0
+	Minor (reclaiming a frame) page faults: 821551
+	Voluntary context switches: 37260
+	Involuntary context switches: 2201821
+	Swaps: 0
+	File system inputs: 1609184
+	File system outputs: 3986952
+	Socket messages sent: 0
+	Socket messages received: 0
+	Signals delivered: 0
+	Page size (bytes): 4096
+	Exit status: 0
+
+-------------------------------------------------------------------------------------
+
+//Command terminated by signal 11
+
+(for sam)
+	#include <iostream>
+	#include <fstream>
+	#include <vector>
+	#include <string>
+
+	struct Read {
+	    std::string id;
+	    int position;
+	};
+
+	void generateSAM(const std::vector<Read>& reads, const std::string& filename) {
+	    std::ofstream samFile(filename);
+
+	    if (!samFile.is_open()) {
+	        std::cerr << "Failed to open file for writing: " << filename << std::endl;
+	        return;
+	    }
+
+	    for (const auto& read : reads) {
+	        // Construct SAM fields
+	        std::string qname = read.id;
+	        int flag = 0;  // Assuming unmapped
+	        std::string rname = "*";  // Reference name
+	        int pos = read.position;
+	        int mapq = 255;  // Mapping quality
+	        std::string cigar = "*";  // CIGAR string
+	        std::string rnext = "*";  // Reference name of the mate/next read
+	        int pnext = 0;  // Position of the mate/next read
+	        int tlen = 0;  // Template length
+	        std::string seq = "*";  // Read sequence
+	        std::string qual = "*";  // Read qualities
+
+	        // Write SAM line
+	        samFile << qname << "\t" << flag << "\t" << rname << "\t" << pos << "\t" << mapq << "\t"
+	                << cigar << "\t" << rnext << "\t" << pnext << "\t" << tlen << "\t" << seq << "\t" << qual << "\n";
+	    }
+
+	    samFile.close();
+	}
+
+	int main() {
+	    std::vector<Read> reads = {
+	        {"read1", 100},
+	        {"read2", 200}
+	    };  // Example list of reads with positions
+	    generateSAM(reads, "output.sam");
+	    std::cout << "SAM file generated successfully!" << std::endl;
+	    return 0;
+	}
+
+
+---------------------pg.161
